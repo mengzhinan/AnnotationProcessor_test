@@ -4,6 +4,7 @@
     <bytecodeTargetLevel target="1.7">
       <module name="AnnotationProcessor_test.app" target="1.8" />
       <module name="AnnotationProcessor_test.Inject-api" target="1.8" />
+      <module name="AnnotationProcessor_test.viewInject" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
