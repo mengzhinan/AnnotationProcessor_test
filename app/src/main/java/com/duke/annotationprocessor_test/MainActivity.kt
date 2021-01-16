@@ -3,8 +3,8 @@ package com.duke.annotationprocessor_test
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.TextView
-import com.duke.inject_api.ViewInjectHelper
-import com.duke.inject_processor.ViewInject
+import com.duke.viewinject.ViewInject
+import com.duke.viewinject.ViewInjectHelper
 
 class MainActivity : AppCompatActivity() {
 

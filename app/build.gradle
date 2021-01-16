@@ -47,7 +47,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
 
-    implementation project(path: ':Inject-api')
-    kapt project(path: ':Inject-processor')
+    implementation project(path: ':viewInject')
+    kapt project(path: ':viewInject')
 
 }

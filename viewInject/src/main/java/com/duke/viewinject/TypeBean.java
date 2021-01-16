@@ -1,4 +1,4 @@
-package com.duke.inject_processor;
+package com.duke.viewinject;
 
 import java.util.ArrayList;
 import java.util.List;

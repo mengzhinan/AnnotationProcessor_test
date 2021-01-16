@@ -1,5 +1,3 @@
 include ':viewInject'
-include ':Inject-processor'
-include ':Inject-api'
 include ':app'
 rootProject.name = "AnnotationProcessor_test"

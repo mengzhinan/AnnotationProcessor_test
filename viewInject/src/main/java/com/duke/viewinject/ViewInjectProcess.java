@@ -1,4 +1,4 @@
-package com.duke.inject_processor;
+package com.duke.viewinject;
 
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
