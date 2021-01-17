@@ -4,7 +4,6 @@ import com.google.auto.service.AutoService;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -38,9 +37,6 @@ public class ViewInjectAbstractProcessor extends AbstractProcessor {
 
     private Messager messager;
     private Elements elementUtils;
-    private final Map<String, AnnotationBean> mProxyMap = new HashMap<>();
-
-    private final Class<? extends Annotation> viewInjectClass = ViewInject.class;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -52,7 +48,7 @@ public class ViewInjectAbstractProcessor extends AbstractProcessor {
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         HashSet<String> supportTypes = new LinkedHashSet<>();
-        supportTypes.add(viewInjectClass.getCanonicalName());
+        supportTypes.add(ViewInject.class.getCanonicalName());
         return supportTypes;
     }
 
@@ -83,13 +79,12 @@ public class ViewInjectAbstractProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         MessageHelper.printLog(messager, Diagnostic.Kind.NOTE, "processing ...");
-        mProxyMap.clear();
 
-        findFieldAnnotations(roundEnv);
+        Map<String, AnnotationBean> fieldMap = findFieldAnnotations(roundEnv);
 
-        if (mProxyMap.size() > 0) {
+        if (fieldMap.size() > 0) {
 
-            createAndWriteFile();
+            createAndWriteFile(fieldMap);
             MessageHelper.printLog(messager, Diagnostic.Kind.NOTE, "process success");
             return true;
         }
@@ -97,39 +92,43 @@ public class ViewInjectAbstractProcessor extends AbstractProcessor {
         return false;
     }
 
-    private void findFieldAnnotations(RoundEnvironment roundEnv) {
-        Set<? extends Element> elementSet = roundEnv.getElementsAnnotatedWith(viewInjectClass);
+    private Map<String, AnnotationBean> findFieldAnnotations(RoundEnvironment roundEnv) {
+
+        Map<String, AnnotationBean> fieldMap = new HashMap<>();
+
+        Set<? extends Element> elementSet = roundEnv.getElementsAnnotatedWith(ViewInject.class);
         for (Element element : elementSet) {
-            checkAnnotationValid(element, viewInjectClass);
+            checkAnnotationValid(element, ViewInject.class);
 
             VariableElement variableElement = (VariableElement) element;
             //class type
-            TypeElement classElement = (TypeElement) variableElement.getEnclosingElement();
+            TypeElement typeElement = (TypeElement) variableElement.getEnclosingElement();
             //full class name
-            String fqClassName = classElement.getQualifiedName().toString();
+            String fqClassName = typeElement.getQualifiedName().toString();
 
-            AnnotationBean parseDataInfo = mProxyMap.get(fqClassName);
-            if (parseDataInfo == null) {
-                parseDataInfo = new AnnotationBean(elementUtils, classElement);
-                mProxyMap.put(fqClassName, parseDataInfo);
+            AnnotationBean bean = fieldMap.get(fqClassName);
+            if (bean == null) {
+                bean = new AnnotationBean(elementUtils, typeElement);
+                fieldMap.put(fqClassName, bean);
             }
 
-            ViewInject bindAnnotation = variableElement.getAnnotation(ViewInject.class);
-            int id = bindAnnotation.value();
-            parseDataInfo.fieldMap.put(id, variableElement);
+            int bindViewId = variableElement.getAnnotation(ViewInject.class).value();
+            bean.fieldMap.put(bindViewId, variableElement);
         }
+
+        return fieldMap;
     }
 
-    private void createAndWriteFile() {
-        if (processingEnv == null) {
+    private void createAndWriteFile(Map<String, AnnotationBean> fieldMap) {
+        if (processingEnv == null || fieldMap.size() <= 0) {
             return;
         }
         Filer filer = processingEnv.getFiler();
         if (filer == null) {
             return;
         }
-        for (String key : mProxyMap.keySet()) {
-            AnnotationBean parseDataInfo = mProxyMap.get(key);
+        for (String key : fieldMap.keySet()) {
+            AnnotationBean parseDataInfo = fieldMap.get(key);
             if (parseDataInfo == null) {
                 continue;
             }
