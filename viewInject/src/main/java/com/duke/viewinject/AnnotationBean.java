@@ -38,47 +38,45 @@ class AnnotationBean {
     }
 
     public String generateJavaCode() {
+
         StringBuilder builder = new StringBuilder();
+
         builder.append("// Generated code. Do not modify!\n");
         builder.append("package ").append(packageName).append(";\n\n");
-        builder.append("import " + IInjectInterface.class.getCanonicalName() + ";\n");
-        builder.append('\n');
+        builder.append("import ").append(IInjectInterface.class.getCanonicalName()).append(";\n\n");
 
-        builder.append("public class ").append(proxyClassSimpleName)
-                .append(" implements " + IInjectInterface.class.getSimpleName());
-        builder.append(" {\n");
+        builder.append("public class ").append(proxyClassSimpleName).append(" implements ")
+                .append(IInjectInterface.class.getSimpleName()).append("<")
+                .append(typeElement.getQualifiedName().toString())
+                .append(">").append(" {\n\n");
 
         generateMethods(builder);
-        builder.append('\n');
 
-        builder.append("}\n");
+        builder.append("\n}\n");
         return builder.toString();
-
     }
 
 
     private void generateMethods(StringBuilder builder) {
 
-        builder.append("@Override\n ");
-        builder.append("public void inject(" + typeElement.getQualifiedName() + " host, Object source ) {\n");
-
+        builder.append("    @Override\n");
+        builder.append("    public void inject(").append(typeElement.getQualifiedName()).append(" host, Object view) {\n");
 
         for (int id : fieldMap.keySet()) {
             Element element = fieldMap.get(id);
             String name = element.getSimpleName().toString();
             String type = element.asType().toString();
-            builder.append(" if(source instanceof android.app.Activity){\n");
-            builder.append("host." + name).append(" = ");
-            builder.append("(" + type + ")(((android.app.Activity)source).findViewById( " + id + "));\n");
-            builder.append("\n}else{\n");
-            builder.append("host." + name).append(" = ");
-            builder.append("(" + type + ")(((android.view.View)source).findViewById( " + id + "));\n");
-            builder.append("\n};");
-
-
+            builder.append("        if (host instanceof android.app.Activity) {\n");
+            builder.append("            host.").append(name).append(" = ")
+                    .append("(").append(type)
+                    .append(") (((android.app.Activity) view).findViewById(").append(id).append("));\n");
+            builder.append("        } else {\n");
+            builder.append("            host.").append(name).append(" = ");
+            builder.append("(").append(type)
+                    .append(") (((android.view.View) view).findViewById(").append(id).append("));\n");
+            builder.append("        }\n");
         }
-        builder.append("  }\n");
-
+        builder.append("    }\n");
     }
 
 }
