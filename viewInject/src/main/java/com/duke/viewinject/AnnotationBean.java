@@ -64,6 +64,7 @@ class AnnotationBean {
             Element element = fieldMap.get(id);
             String name = element.getSimpleName().toString();
             String type = element.asType().toString();
+
             builder.append("        if (host instanceof android.app.Activity) {\n");
             builder.append("            host.").append(name).append(" = ")
                     .append("(").append(type)
