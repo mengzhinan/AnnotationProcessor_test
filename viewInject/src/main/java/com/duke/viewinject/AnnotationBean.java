@@ -1,10 +1,10 @@
 package com.duke.viewinject;
 
-import com.duke.viewinject.newp.IViewInject;
-
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -16,40 +16,36 @@ import javax.lang.model.util.Elements;
  * dateTime: 2021-01-17 12:11
  * description:
  */
-public class AnnotationBean {
+class AnnotationBean {
 
     public static final String CLASS_PROXY = "$ViewInject";
 
-    private String packageName;
-    private String proxyClassName;
-    private TypeElement typeElement;
+    public TypeElement typeElement;
+    public String packageName;
+    public String proxyClassSimpleName;
 
-    public Map<Integer, VariableElement> injectVariables = new HashMap<>();
-
+    public final Map<Integer, VariableElement> fieldMap = new HashMap<>();
+    public final Map<Integer, ExecutableElement> clickMethodMap = new HashMap<>();
 
     public AnnotationBean(Elements elementUtils, TypeElement classElement) {
         this.typeElement = classElement;
-        PackageElement packageElement = elementUtils.getPackageOf(classElement);
-        String packageName = packageElement.getQualifiedName().toString();
-        //classname
-        String className = getClassName(classElement, packageName);
-        this.packageName = packageName;
-        this.proxyClassName = className + CLASS_PROXY;
-    }
 
-    public static String getClassName(TypeElement type, String packageName) {
-        int packageLen = packageName.length() + 1;
-        return type.getQualifiedName().toString().substring(packageLen);
+        PackageElement packageElement = elementUtils.getPackageOf(classElement);
+        this.packageName = packageElement.getQualifiedName().toString();
+
+        String classSimpleName = classElement.getQualifiedName().toString().substring(packageName.length() + 1);
+        this.proxyClassSimpleName = classSimpleName + CLASS_PROXY;
     }
 
     public String generateJavaCode() {
         StringBuilder builder = new StringBuilder();
         builder.append("// Generated code. Do not modify!\n");
         builder.append("package ").append(packageName).append(";\n\n");
-        builder.append("import com.duke.inject_processor.*;\n");
+        builder.append("import " + IInjectInterface.class.getCanonicalName() + ";\n");
         builder.append('\n');
 
-        builder.append("public class ").append(proxyClassName).append(" implements " + IViewInject.class.getSimpleName() + "<" + typeElement.getQualifiedName() + ">");
+        builder.append("public class ").append(proxyClassSimpleName)
+                .append(" implements " + IInjectInterface.class.getSimpleName());
         builder.append(" {\n");
 
         generateMethods(builder);
@@ -67,8 +63,8 @@ public class AnnotationBean {
         builder.append("public void inject(" + typeElement.getQualifiedName() + " host, Object source ) {\n");
 
 
-        for (int id : injectVariables.keySet()) {
-            VariableElement element = injectVariables.get(id);
+        for (int id : fieldMap.keySet()) {
+            Element element = fieldMap.get(id);
             String name = element.getSimpleName().toString();
             String type = element.asType().toString();
             builder.append(" if(source instanceof android.app.Activity){\n");
@@ -83,16 +79,6 @@ public class AnnotationBean {
         }
         builder.append("  }\n");
 
-
     }
-
-    public String getProxyClassFullName() {
-        return packageName + "." + proxyClassName;
-    }
-
-    public TypeElement getTypeElement() {
-        return typeElement;
-    }
-
 
 }

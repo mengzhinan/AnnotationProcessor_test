@@ -6,6 +6,6 @@ package com.duke.viewinject;
  * dateTime: 2021-01-03 19:02
  * description:
  */
-public interface IInjectInterface {
+interface IInjectInterface {
     void inject(Object host, Object view);
 }

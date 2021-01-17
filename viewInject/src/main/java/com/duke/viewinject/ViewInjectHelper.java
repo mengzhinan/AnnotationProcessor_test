@@ -23,7 +23,7 @@ public class ViewInjectHelper {
         } catch (IllegalAccessException | ClassNotFoundException | InstantiationException e) {
             e.printStackTrace();
             String param1 = host.getClass().getSimpleName() + AnnotationBean.CLASS_PROXY;
-            String param2 = com.duke.viewinject.newp.ViewInjectHelper.class.getSimpleName();
+            String param2 = ViewInjectHelper.class.getSimpleName();
             String error = String.format("Can not find %s in %s.", param1, param2);
             throw new RuntimeException(error);
         }

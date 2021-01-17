@@ -11,7 +11,7 @@ import javax.tools.Diagnostic;
  * dateTime: 2021-01-17 13:13
  * description:
  */
-public class MessageHelper {
+class MessageHelper {
 
     public static void printLog(Messager messager, Diagnostic.Kind kind, CharSequence msg) {
         printLog(messager, kind, msg, null);

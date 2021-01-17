@@ -1,7 +1,5 @@
 package com.duke.viewinject;
 
-import com.duke.viewinject.newp.Bind;
-import com.duke.viewinject.newp.ParseDataInfo;
 import com.google.auto.service.AutoService;
 
 import java.io.IOException;
@@ -39,7 +37,7 @@ public class ViewInjectAbstractProcessor extends AbstractProcessor {
 
     private Messager messager;
     private Elements elementUtils;
-    private final Map<String, ParseDataInfo> mProxyMap = new HashMap<String, ParseDataInfo>();
+    private final Map<String, AnnotationBean> mProxyMap = new HashMap<>();
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -51,7 +49,7 @@ public class ViewInjectAbstractProcessor extends AbstractProcessor {
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         HashSet<String> supportTypes = new LinkedHashSet<>();
-        supportTypes.add(Bind.class.getCanonicalName());
+        supportTypes.add(ViewInject.class.getCanonicalName());
         return supportTypes;
     }
 
@@ -95,9 +93,9 @@ public class ViewInjectAbstractProcessor extends AbstractProcessor {
     }
 
     private void findAnnotations(RoundEnvironment roundEnv) {
-        Set<? extends Element> elementSet = roundEnv.getElementsAnnotatedWith(Bind.class);
+        Set<? extends Element> elementSet = roundEnv.getElementsAnnotatedWith(ViewInject.class);
         for (Element element : elementSet) {
-            checkAnnotationValid(element, Bind.class);
+            checkAnnotationValid(element, ViewInject.class);
 
             VariableElement variableElement = (VariableElement) element;
             //class type
@@ -105,15 +103,15 @@ public class ViewInjectAbstractProcessor extends AbstractProcessor {
             //full class name
             String fqClassName = classElement.getQualifiedName().toString();
 
-            ParseDataInfo parseDataInfo = mProxyMap.get(fqClassName);
+            AnnotationBean parseDataInfo = mProxyMap.get(fqClassName);
             if (parseDataInfo == null) {
-                parseDataInfo = new ParseDataInfo(elementUtils, classElement);
+                parseDataInfo = new AnnotationBean(elementUtils, classElement);
                 mProxyMap.put(fqClassName, parseDataInfo);
             }
 
-            Bind bindAnnotation = variableElement.getAnnotation(Bind.class);
+            ViewInject bindAnnotation = variableElement.getAnnotation(ViewInject.class);
             int id = bindAnnotation.value();
-            parseDataInfo.injectVariables.put(id, variableElement);
+            parseDataInfo.fieldMap.put(id, variableElement);
         }
     }
 
@@ -126,7 +124,7 @@ public class ViewInjectAbstractProcessor extends AbstractProcessor {
             return;
         }
         for (String key : mProxyMap.keySet()) {
-            ParseDataInfo parseDataInfo = mProxyMap.get(key);
+            AnnotationBean parseDataInfo = mProxyMap.get(key);
             if (parseDataInfo == null) {
                 continue;
             }
@@ -134,8 +132,8 @@ public class ViewInjectAbstractProcessor extends AbstractProcessor {
 
                 // 生成代码文件
                 JavaFileObject jfo = filer.createSourceFile(
-                        parseDataInfo.getProxyClassFullName(),
-                        parseDataInfo.getTypeElement());
+                        parseDataInfo.proxyClassSimpleName,
+                        parseDataInfo.typeElement);
 
                 Writer writer = jfo.openWriter();
                 // 填充文件内容
@@ -145,12 +143,12 @@ public class ViewInjectAbstractProcessor extends AbstractProcessor {
 
             } catch (IOException e) {
                 String error = String.format("Unable to write injector for type %s: %s",
-                        parseDataInfo.getTypeElement(),
+                        parseDataInfo.typeElement,
                         e.getMessage());
                 MessageHelper.printLog(messager,
                         Diagnostic.Kind.ERROR,
                         error,
-                        parseDataInfo.getTypeElement());
+                        parseDataInfo.typeElement);
             }
         }
     }
