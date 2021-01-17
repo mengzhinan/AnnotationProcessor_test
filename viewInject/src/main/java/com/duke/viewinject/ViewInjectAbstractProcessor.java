@@ -2,7 +2,6 @@ package com.duke.viewinject;
 
 import com.duke.viewinject.newp.Bind;
 import com.duke.viewinject.newp.ParseDataInfo;
-import com.duke.viewinject.newp.ViewInjectUtil;
 import com.google.auto.service.AutoService;
 
 import java.io.IOException;
@@ -22,6 +21,7 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
@@ -170,7 +170,7 @@ public class ViewInjectAbstractProcessor extends AbstractProcessor {
             MessageHelper.printLog(messager,
                     Diagnostic.Kind.ERROR,
                     error);
-        } else if (ViewInjectUtil.isPrivate(field)) {
+        } else if (field.getModifiers().contains(Modifier.PRIVATE)) {
             // 不能是私有的
             String error = String.format("%s() must can not be mask private.",
                     field.getSimpleName());

@@ -1,7 +1,6 @@
 package com.duke.viewinject;
 
 import com.duke.viewinject.newp.IViewInject;
-import com.duke.viewinject.newp.ViewInjectUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,6 +18,8 @@ import javax.lang.model.util.Elements;
  */
 public class AnnotationBean {
 
+    public static final String CLASS_PROXY = "$ViewInject";
+
     private String packageName;
     private String proxyClassName;
     private TypeElement typeElement;
@@ -31,11 +32,15 @@ public class AnnotationBean {
         PackageElement packageElement = elementUtils.getPackageOf(classElement);
         String packageName = packageElement.getQualifiedName().toString();
         //classname
-        String className = ViewInjectUtil.getClassName(classElement, packageName);
+        String className = getClassName(classElement, packageName);
         this.packageName = packageName;
-        this.proxyClassName = className + ViewInjectUtil.CLASS_PROXY;
+        this.proxyClassName = className + CLASS_PROXY;
     }
 
+    public static String getClassName(TypeElement type, String packageName) {
+        int packageLen = packageName.length() + 1;
+        return type.getQualifiedName().toString().substring(packageLen);
+    }
 
     public String generateJavaCode() {
         StringBuilder builder = new StringBuilder();
@@ -88,7 +93,6 @@ public class AnnotationBean {
     public TypeElement getTypeElement() {
         return typeElement;
     }
-
 
 
 }
