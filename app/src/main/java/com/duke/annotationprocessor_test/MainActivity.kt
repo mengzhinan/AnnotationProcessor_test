@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         ViewInjectHelper.injectView(this)
+
         myView?.text = "赋值成功了89"
         myView2?.text = "OK 了"
 
