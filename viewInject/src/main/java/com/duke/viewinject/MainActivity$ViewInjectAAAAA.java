@@ -1,7 +1,7 @@
 // Generated code. Do not modify!
 package com.duke.viewinject;
 
-public class MainActivity$ViewInject
+public class MainActivity$ViewInjectAAAAA
 {
 //    public void inject(Object host, Object source) {
 //        if (source instanceof android.app.Activity) {
