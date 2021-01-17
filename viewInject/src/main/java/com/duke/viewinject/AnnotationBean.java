@@ -61,9 +61,9 @@ class AnnotationBean {
         builder.append("    public void inject(").append(typeElement.getQualifiedName()).append(" host, Object view) {\n");
 
         for (int id : fieldMap.keySet()) {
-            Element element = fieldMap.get(id);
-            String name = element.getSimpleName().toString();
-            String type = element.asType().toString();
+            Element field = fieldMap.get(id);
+            String name = field.getSimpleName().toString();
+            String type = field.asType().toString();
 
             builder.append("        if (host instanceof android.app.Activity) {\n");
             builder.append("            host.").append(name).append(" = ")
