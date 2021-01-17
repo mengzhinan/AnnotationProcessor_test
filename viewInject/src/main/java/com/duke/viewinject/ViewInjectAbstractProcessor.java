@@ -4,6 +4,7 @@ import com.google.auto.service.AutoService;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -39,6 +40,8 @@ public class ViewInjectAbstractProcessor extends AbstractProcessor {
     private Elements elementUtils;
     private final Map<String, AnnotationBean> mProxyMap = new HashMap<>();
 
+    private final Class<? extends Annotation> viewInjectClass = ViewInject.class;
+
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
@@ -49,7 +52,7 @@ public class ViewInjectAbstractProcessor extends AbstractProcessor {
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         HashSet<String> supportTypes = new LinkedHashSet<>();
-        supportTypes.add(ViewInject.class.getCanonicalName());
+        supportTypes.add(viewInjectClass.getCanonicalName());
         return supportTypes;
     }
 
@@ -79,23 +82,25 @@ public class ViewInjectAbstractProcessor extends AbstractProcessor {
      */
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        MessageHelper.printLog(messager, Diagnostic.Kind.NOTE, "process...");
+        MessageHelper.printLog(messager, Diagnostic.Kind.NOTE, "processing ...");
         mProxyMap.clear();
-        findAnnotations(roundEnv);
+
+        findFieldAnnotations(roundEnv);
+
         if (mProxyMap.size() > 0) {
-            generateJavaCode();
-            mProxyMap.clear();
-            MessageHelper.printLog(messager, Diagnostic.Kind.NOTE, "processed");
+
+            createAndWriteFile();
+            MessageHelper.printLog(messager, Diagnostic.Kind.NOTE, "process success");
             return true;
         }
-        MessageHelper.printLog(messager, Diagnostic.Kind.NOTE, "processed");
+        MessageHelper.printLog(messager, Diagnostic.Kind.NOTE, "no process");
         return false;
     }
 
-    private void findAnnotations(RoundEnvironment roundEnv) {
-        Set<? extends Element> elementSet = roundEnv.getElementsAnnotatedWith(ViewInject.class);
+    private void findFieldAnnotations(RoundEnvironment roundEnv) {
+        Set<? extends Element> elementSet = roundEnv.getElementsAnnotatedWith(viewInjectClass);
         for (Element element : elementSet) {
-            checkAnnotationValid(element, ViewInject.class);
+            checkAnnotationValid(element, viewInjectClass);
 
             VariableElement variableElement = (VariableElement) element;
             //class type
@@ -115,7 +120,7 @@ public class ViewInjectAbstractProcessor extends AbstractProcessor {
         }
     }
 
-    private void generateJavaCode() {
+    private void createAndWriteFile() {
         if (processingEnv == null) {
             return;
         }

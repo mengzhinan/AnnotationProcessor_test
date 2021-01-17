@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -25,7 +24,6 @@ class AnnotationBean {
     public String proxyClassSimpleName;
 
     public final Map<Integer, VariableElement> fieldMap = new HashMap<>();
-    public final Map<Integer, ExecutableElement> clickMethodMap = new HashMap<>();
 
     public AnnotationBean(Elements elementUtils, TypeElement classElement) {
         this.typeElement = classElement;

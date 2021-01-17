@@ -1,5 +1,6 @@
 package com.duke.viewinject;
 
+import javax.annotation.Nonnull;
 
 /**
  * author: duke
@@ -10,22 +11,28 @@ package com.duke.viewinject;
 public class ViewInjectHelper {
 
     public static void injectView(Object activity) {
+        if (activity == null) {
+            return;
+        }
         findProxyActivity(activity).inject(activity, activity);
     }
 
     public static void injectView(Object holder, Object view) {
+        if (holder == null || view == null) {
+            return;
+        }
         findProxyActivity(holder).inject(holder, view);
     }
 
-    private static IInjectInterface findProxyActivity(Object host) {
+    private static IInjectInterface findProxyActivity(@Nonnull Object host) {
+        String className = host.getClass().getName() + AnnotationBean.CLASS_PROXY;
         try {
-            return (IInjectInterface) Class.forName(host.getClass().getName() + AnnotationBean.CLASS_PROXY).newInstance();
+            return (IInjectInterface) Class.forName(className).newInstance();
         } catch (IllegalAccessException | ClassNotFoundException | InstantiationException e) {
             e.printStackTrace();
-            String param1 = host.getClass().getSimpleName() + AnnotationBean.CLASS_PROXY;
-            String param2 = ViewInjectHelper.class.getSimpleName();
-            String error = String.format("Can not find %s in %s.", param1, param2);
-            throw new RuntimeException(error);
+            throw new RuntimeException(String.format("Can not find %s in %s.",
+                    className,
+                    ViewInjectHelper.class.getSimpleName()));
         }
     }
 }
