@@ -1,10 +1,10 @@
 package com.duke.annotationprocessor_test
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.TextView
-import com.duke.viewinject.old.ViewInject
-import com.duke.viewinject.old.ViewInjectHelper
+import androidx.appcompat.app.AppCompatActivity
+import com.duke.viewinject.ViewInject
+import com.duke.viewinject.ViewInjectHelper
 
 class MainActivity : AppCompatActivity() {
 
@@ -16,11 +16,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        ViewInjectHelper.inject(this)
-        myView!!.text = "赋值成功了89"
+        ViewInjectHelper.injectView(this)
+        myView?.text = "赋值成功了89"
 
     }
-
 
 
 }
