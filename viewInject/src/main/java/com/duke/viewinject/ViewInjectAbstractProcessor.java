@@ -84,6 +84,7 @@ public class ViewInjectAbstractProcessor extends AbstractProcessor {
 
         if (fieldMap.size() > 0) {
 
+//            JavaPOETCoder.generateCode(processingEnv.getFiler(), fieldMap);
             createAndWriteFile(fieldMap);
             MessageHelper.printLog(messager, Diagnostic.Kind.NOTE, "process success");
             return true;
