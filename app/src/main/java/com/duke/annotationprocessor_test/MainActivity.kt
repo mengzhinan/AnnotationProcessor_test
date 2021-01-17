@@ -12,12 +12,17 @@ class MainActivity : AppCompatActivity() {
     @ViewInject(R.id.text_view)
     var myView: TextView? = null
 
+    @JvmField
+    @ViewInject(R.id.text_view2)
+    var myView2: TextView? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         ViewInjectHelper.injectView(this)
         myView?.text = "赋值成功了89"
+        myView2?.text = "OK 了"
 
     }
 

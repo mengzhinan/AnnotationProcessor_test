@@ -80,12 +80,12 @@ public class ViewInjectAbstractProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         MessageHelper.printLog(messager, Diagnostic.Kind.NOTE, "processing ...");
 
-        Map<String, AnnotationBean> fieldMap = findFieldAnnotations(roundEnv);
+        Map<String, AnnotationBean> typeElementMap = findFieldAnnotations(roundEnv);
 
-        if (fieldMap.size() > 0) {
+        if (typeElementMap.size() > 0) {
 
-//            JavaPOETCoder.generateCode(processingEnv.getFiler(), fieldMap);
-            createAndWriteFile(fieldMap);
+//            JavaPOETCoder.generateCode(processingEnv.getFiler(), typeElementMap);
+            createAndWriteFile(typeElementMap);
             MessageHelper.printLog(messager, Diagnostic.Kind.NOTE, "process success");
             return true;
         }
@@ -159,7 +159,6 @@ public class ViewInjectAbstractProcessor extends AbstractProcessor {
     }
 
     /**
-     * 检查注解有效性
      *
      * @param field
      * @param clazz
